@@ -1,0 +1,57 @@
+- la entrega es el martes próximo.
+- la práctica 2 tiene una valoración pequeña
+    P1: 2/5
+    P2: 0.5/5
+    P3: 1.5/5
+    Prácticas de Fran (todas): 1/5
+- el enunciado de la P2 es el mismo que el de la P1, pero con flex.
+- las calificaciones de los evaluadores son: buena, neutra, mala. al evaluador:
+    # una buena, implica respuestas elaboradas de los motivos, con sugerencias de mejoras respecto al código.
+      es importante pararse a leerlo y no solo ejecutarlo. (sube la nota del evaluador).
+    # una neutra, solo describe lo que ve. (no afecta a la nota del evaluador).
+    # una mala, un alumno que se equivoca en los juicios que emite o que desiste de juzgar lo que ve. (si la
+      evaluación es mala, baja la nota del evaluador).
+- go.l incluye la especficación de la porción del lenguaje Go necesaria para realizar el análisis léxico de
+  concurrentSum.go
+- hacer go.l es el objetivo de la P2.
+- flex proporciona su propio sistema de entrada.
+- los módulos de sistema de entrada y análisis léxico de la P1 por lo que nos proporciona flex y todo funciona
+  igual.
+- le nuevo módulo go.yy.c se inserta en el proyecto de la P1 y se compila junto con todo lo demás.
+- yylex() de go.yy.c es la función equivalente a sig_comp_lexico().
+- en go.l también tienen que estar las acciones para cada tipo de comp. léxico.
+- las expresiones regulare se copian de la página de especificación: seccion de definiciones.
+- la seccion de reglas de traducción son las acciones.
+- las rutinas auxiliares pueden incluir funciones en C que pueden ayudar a hacer cosas.
+- el estilo de go.l es parecido al de C.
+- el ejemplo de fichero de especificación de las diapositivas está mal. No tomar como ejemplo.
+- qué son los identificadores se resuelven a través de la TS, no uno a uno en el fichero de especficiación.
+- hay 2 maneras muy fáciles de abordar la sustitución:
+    # compilamos y tenemos go.yy.c. En el fichero de analisis_lexico(), borramos el contenido de sig_comp_lexico().
+      Usamos sig_comp_lexico() como un wrapper (envoltorio) de yylex(). yylex() devuelve el int apropiado, y nosotros
+      metemos ese número en la struct. flex almacena el lexema actual en una variable yytext. Desde esta, lo compilamos
+      en el struct y ya podemos devolver sig_comp_lexico().
+    # otra opción: podemos borrar todo el analizador léxico. tenemos que hacer que yylex() se comporte como lo que
+      teníamos antes, de modo que no solo devuelva un int. El manual de flex nos proporciona una forma de cambiar el tipo
+      de yylex() para que funcione como sig_comp_lexico() (parece la peor opción).
+- todo el resto de la práctica anterior permanece exactamente igual.
+- el manual del CV está en castellano, pero no es el último. Para esta práctica es suficiente.
+- en el manual nuevo puede aparecer cómo hacer todos los includes necesarios.
+- el consejo fundamental es LEER el manual (hasta la página 16, o 17, con las condiciones de arranque).
+- respecto a los errores, es más fácil que se nos ocurran expresiones regulares que comportan error. En esta práctica
+  es mucho más sencillo y tendrá sentido hacerlo. La práctica debe ser capaz de que, si emite un error, sepa en qué línea
+  se produce. Pero algunos componentes léxicos pueden ocupar más de una línea => el autómata de yylex() no debe comerse
+  el salto de línea. flex proporciona formas para resolver este problema: una de ellas muy sencilla. ESTO ES MUY 
+  IMPORTANTE.
+- la P1 es una disculpa para leer el manual de flex.
+- la P3 es una disculpa para leer el manual de Byson.
+- para la entrega, se entrega en una carpeta todo el software (también con el .l, con el concurrentSum.go).
+- ya se puede identificar la práctica con el nombre.
+- en LEEME.txt, se ponen las versiones específicas de gcc, la versión de Linux que usamos y la versión de flex. Usar
+  valgrind para no cometer errores con la memoria.
+- para los ;, tenemos que diseñarlo y gestionarlo. Esto escapa al funcionamiento de un AFD, pero se puede programar en
+  las acciones del .l. También tenemos una pila, con instrucciones para manejarla.
+
+- pasos para hacer la práctica:
+    # leerse el manual pronto y hacer pruebas.
+    # hacer la práctica
