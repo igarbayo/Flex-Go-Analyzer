@@ -1,0 +1,116 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include "definiciones.h"
+
+#define RED     "\x1b[31m"
+#define YELLOW  "\x1b[33m"
+#define RESET   "\x1b[0m"
+
+int i = 1; // Variable global para numerar las líneas de salida
+
+%}
+
+%x COMMENT_BLOCK 
+
+letter        [a-zA-Z_]
+decimal_digit [0-9]
+binary_digit  [01]
+octal_digit   [0-7]
+hex_digit     [0-9a-fA-F]
+
+identifier    {letter}({letter}|{decimal_digit})*
+
+decimal_lit   0|([1-9][_]?{decimal_digit}*)
+binary_lit    0[bB]{binary_digit}+
+octal_lit     0[oO]?{octal_digit}+
+hex_lit       0[xX]{hex_digit}+
+
+int_lit       {decimal_lit}|{binary_lit}|{octal_lit}|{hex_lit}
+
+decimal_digits {decimal_digit}([_]?[decimal_digit])*
+binary_digits  {binary_digit}([_]?[binary_digit])*
+octal_digits   {octal_digit}([_]?[octal_digit])*
+hex_digits     {hex_digit}([_]?[hex_digit])*
+
+decimal_exponent [eE][+-]?{decimal_digits}
+decimal_float_lit ({decimal_digits}\.?{decimal_digits}?{decimal_exponent}?)|\.({decimal_digits}{decimal_exponent}?)
+
+hex_mantissa [_]?{hex_digits}\.?{hex_digits}?
+hex_exponent [pP][+-]?{decimal_digits}
+hex_float_lit 0[xX]{hex_mantissa}{hex_exponent}
+
+float_lit {decimal_float_lit}|{hex_float_lit}
+
+imaginary_lit ({decimal_digits}|{int_lit}|{float_lit})i
+
+raw_string_lit `([^`]|[\n])*`
+interpreted_string_lit \"([^\"\\]|\\.)*\"
+string_lit {raw_string_lit}|{interpreted_string_lit}
+
+%%
+
+\/\/[^\n]*         { /* No hacer nada, solo ignorar */ }
+
+\/\*              { BEGIN(COMMENT_BLOCK); }  
+
+<COMMENT_BLOCK>{
+    \*\/         { BEGIN(INITIAL); }  /* Salir del modo de comentario */
+    .|\n        { /* No hacer nada, solo ignorar */ }
+}
+
+{identifier}           { printf("%d IDENTIFIER: %s\n", i++, yytext); }
+{int_lit}              { printf("%d INTEGER LITERAL: %s\n", i++, yytext); }
+{float_lit}            { printf("%d FLOAT LITERAL: %s\n", i++, yytext); }
+{imaginary_lit}        { printf("%d IMAGINARY LITERAL: %s\n", i++, yytext); }
+{string_lit}           { printf("%d STRING LITERAL: %s\n", i++, yytext); }
+
+[ \t\n]+              ;  /* Ignorar espacios y saltos de línea */
+
+"<<="   { return MENORDOBLEIGUAL; }
+"&^="  { return AMPERSANDCIRCUNFLEJOIGUAL; }
+"..."  { return TRESPUNTOS; }
+
+"<<"    { return MENORDOBLE; }
+">>"    { return MAYORDOBLE; }
+"&^"    { return AMPERSANDCIRCUNFLEJO; }
+"++"    { return MASDOBLE;}
+"--"    { return MENOSDOBLE; }
+"=="    { return IGUALDOBLE; }
+"!="    { return EXCLAMACIONIGUAL; }
+"<="    { return MENORIGUAL; }
+">="    { return MAYORIGUAL; }
+":="    { return DOSPUNTOSIGUAL; }
+
+"+"     { return (int) '+'; }
+"-"     { return (int) '-'; }
+"*"     { return (int) '*'; }
+"%"     { return (int) '%'; }
+"&"     { return (int) '&'; }
+"|"     { return (int) '|'; }
+"^"     { return (int) '^'; }
+"<"     { return (int) '<'; }
+">"     { return (int) '>'; }
+"="     { return (int) '='; }
+"!"     { return (int) '!'; }
+"~"     { return (int) '~'; }
+":"     { return (int) ':'; }
+","     { return (int) ','; }
+";"     { return (int) ';'; }
+"("     { return (int) '('; }
+")"     { return (int) ')'; }
+"["     { return (int) '['; }
+"]"     { return (int) ']'; }
+"{"     { return (int) '{'; }
+"}"     { return (int) '}'; }
+
+
+.                     { printf(RED "UNKNOWN: %s\n" RESET, yytext); }
+
+%%
+
+int main() {
+    yylex();
+    return 0;
+}
+

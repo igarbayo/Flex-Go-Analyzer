@@ -198,6 +198,15 @@ P1_CompGo_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 P1_CompGo_SOURCE_DIR:STATIC=/home/ignacio/Escritorio/Cuarto/Segundo Cuatri/Compiladores/P2-Flex
 
+//Value Computed by CMake
+P2_Flex_BINARY_DIR:STATIC=/home/ignacio/Escritorio/Cuarto/Segundo Cuatri/Compiladores/P2-Flex/cmake-build-debug
+
+//Value Computed by CMake
+P2_Flex_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+P2_Flex_SOURCE_DIR:STATIC=/home/ignacio/Escritorio/Cuarto/Segundo Cuatri/Compiladores/P2-Flex
+
 
 ########################
 # INTERNAL cache entries

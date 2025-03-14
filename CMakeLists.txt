@@ -16,4 +16,6 @@ add_executable(P1_CompGo main.c
         sistema_entrada.c
         sistema_entrada.h
         errores.c
-        errores.h)
+        errores.h
+        lex.yy.c
+)

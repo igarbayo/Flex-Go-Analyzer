@@ -14,20 +14,28 @@
 // Variable global (se le asignan valores iniciales)
 contenedor c = {-1, NULL};
 
+// Variables globales
+extern int linea;
+extern int columna;
+
 // Contadores globales para impresión de errores
-int linea = 1;
-int columna = 0;
-int columna_antigua = 1;
+int lin = 1;
+int col = 0;
+int col_ant = 1;
 
 // Variables globales para manejar semicolon (;)
-short insertarSemicolon = 0;
-char* semicolon;
+short insertarSemi = 0;
+char* semi;
 
 // Variable global para el lexema de EOF
 char* end_of_file;
 
 // Variable global para el resultado de la suma de strings
 char* resultado;
+
+extern int yylex();  // Declarar la función generada por Flex
+extern char* yytext; // Contiene el texto del token actual
+extern FILE *yyin;  // Declaración de la variable global de Flex
 
 
 // FUNCIONES PRIVADAS (CABECERAS) ////////////////////////////////////
@@ -96,7 +104,7 @@ int _procesarHexadecimal();
 /**
  * Guarda en el contenedor un semicolon (;)
  */
-void _devolverSemicolon();
+//void _devolverSemicolon();
 
 /**
  * Si no está en la TS, inserta un lexema
@@ -109,46 +117,55 @@ void _buscar_insertar_lexema(int comp_lexico);
  * Si hay salto de línea, lo procesa
  * @param caracter procesado
  */
-void _sumar_columna(char caracter);
+void _sumar_col(char caracter);
 
 /**
  * Resta una unidad al conteo de columnas del programa.
  * Si hay salto de línea, lo procesa.
  * @param caracter procesado
  */
-void _restar_columna(char caracter);
+void _restar_col(char caracter);
 
 /**
  * Pasa los contadores a la línea siguiente a la actual.
  * Se utiliza en _sumar_columna()
  */
-void _sumar_linea();
+void _sumar_lin();
 
 /**
  * Pasa los contadores a la línea anterior a la actual.
  * Se utiliza en _restar_columna()
  */
-void _restar_linea();
+void _restar_lin();
 
 
 // FUNCIONES PÚBLICAS /////////////////////////////////////////
 
 void iniciar_analisis_lexico(char* fichero) {
-    iniciar_sistema_entrada(fichero);
+    // Abrir el archivo en modo lectura
+    yyin = fopen(fichero, "r");
+    if (!yyin) {
+        error_fichero();
+    }
 }
 
 void terminar_analisis_lexico() {
-    if (end_of_file != NULL) {
-        free(end_of_file);
-    }
-    if (resultado != NULL) {
-        free(resultado);
-    }
-    cerrar_sistema_entrada();
+    fclose(yyin);
 }
 
 contenedor sig_comp_lexico() {
 
+    // Vacía el contenedor global
+    //_vaciar_contenedor();
+
+    if ((c.comp_lexico = yylex()) != 0) {
+        c.lexema = yytext;
+        printf("Línea: %d\tColumna: %d\t", linea, columna);
+    }
+
+    return c;
+
+    /*
     // Consume un carácter del sistema de entrada
     char sig = sig_caracter(); _sumar_columna(sig);
 
@@ -223,6 +240,7 @@ contenedor sig_comp_lexico() {
 
     // Devolvemos el contenedor con el componente léxico y el lexema
     return c;
+    */
 }
 
 
@@ -243,20 +261,24 @@ int _procesarComentario() {
     int estado = 0;
 
     // segundoCaracter puede ser / (empieza por //) o * (empieza por / y * y acaba en * seguido de/)
-    char segundoCaracter = sig_caracter(); _sumar_columna(segundoCaracter);
+    char segundoCaracter = sig_caracter();
+    _sumar_col(segundoCaracter);
 
     switch (segundoCaracter) {
         case '/':
             // Tipo "//"
-            sig = sig_caracter(); _sumar_columna(sig);
+            sig = sig_caracter();
+            _sumar_col(sig);
             while (sig != '\n') {
                 // Mientras no haya saltos de línea
-                sig = sig_caracter(); _sumar_columna(sig);
+                sig = sig_caracter();
+                _sumar_col(sig);
             }
             break;
         case '*':
             // Tipo "/**/"
-            sig = sig_caracter(); _sumar_columna(sig);
+            sig = sig_caracter();
+            _sumar_col(sig);
             while (estado != FIN_COMPONENTE) {
                 switch (estado) {
                     case 0:
@@ -269,7 +291,7 @@ int _procesarComentario() {
                         if (sig == '/') {
                             // Si leemos */
                             estado = FIN_COMPONENTE;
-                            insertarSemicolon = 0;
+                            insertarSemi = 0;
                         } else {
                             // Si solo era *
                             estado = 0;
@@ -279,14 +301,16 @@ int _procesarComentario() {
                         break;
                 }
                 // Consumimos un carácter
-                sig = sig_caracter(); _sumar_columna(sig);
+                sig = sig_caracter();
+                _sumar_col(sig);
             }
             break;
         default:
             // Se procesa / como un operador
-            devolver_un_caracter(); _restar_columna(segundoCaracter);
+            devolver_un_caracter();
+            _restar_col(segundoCaracter);
             _procesarOperador('/');
-            insertarSemicolon = 0;
+            insertarSemi = 0;
             return 1;
             break;
 
@@ -303,17 +327,19 @@ void _procesarIdentificador() {
     int estado = 0;
     while (estado != FIN_COMPONENTE) {
         // Se consume un carácter
-        sig = sig_caracter(); _sumar_columna(sig);
+        sig = sig_caracter();
+        _sumar_col(sig);
         if (!isalnum(sig) && sig != '_') {
             // Si no es un alphanum o un underscore (_)
             estado = FIN_COMPONENTE;
             // Se devuelve el carácter leído de más
-            devolver_un_caracter(); _restar_columna(sig);
+            devolver_un_caracter();
+            _restar_col(sig);
             // Aceptamos el lexema
             if (copiar_lexema(&c) == 1) {
-                error_tambloque(linea, columna, c.lexema);
+                error_tambloque(lin, col, c.lexema);
             }
-            insertarSemicolon = 1;
+            insertarSemi = 1;
 
             if (c.lexema != NULL) {
                 // Si hay lexema, vemos si hace falta insertarlo en la TS
@@ -325,126 +351,153 @@ void _procesarIdentificador() {
 
 void _procesarOperador(char primerCaracter) {
     // Leemos otros dos caracteres para el procesamiento
-    char segundoCaracter = sig_caracter(); _sumar_columna(segundoCaracter);
-    char tercerCaracter = sig_caracter(); _sumar_columna(tercerCaracter);
+    char segundoCaracter = sig_caracter();
+    _sumar_col(segundoCaracter);
+    char tercerCaracter = sig_caracter();
+    _sumar_col(tercerCaracter);
 
     // Comprobamos si es alguno de los operadores multicarácter
     if (primerCaracter == '<' && segundoCaracter == '<' && tercerCaracter == '=') {
         (c.comp_lexico) = MENORDOBLEIGUAL;
-        insertarSemicolon = 0;
+        insertarSemi = 0;
     } else if (primerCaracter == '>' && segundoCaracter == '>' && tercerCaracter == '=') {
         (c.comp_lexico) = MAYORDOBLEIGUAL;
-        insertarSemicolon = 0;
+        insertarSemi = 0;
     } else if (primerCaracter == '&' && segundoCaracter == '^' && tercerCaracter == '=') {
         (c.comp_lexico) = AMPERSANDCIRCUNFLEJOIGUAL;
-        insertarSemicolon = 0;
+        insertarSemi = 0;
     } else if (primerCaracter == '.' && segundoCaracter == '.' && tercerCaracter == '.') {
         (c.comp_lexico) = TRESPUNTOS;
-        insertarSemicolon = 0;
+        insertarSemi = 0;
     } else if (primerCaracter == '<' && segundoCaracter == '<') {
         (c.comp_lexico) = MENORDOBLE;
         // Devolvemos un caracter leído de más
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '>' && segundoCaracter == '>') {
         (c.comp_lexico) = MAYORDOBLE;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '&' && segundoCaracter == '^') {
         (c.comp_lexico) = AMPERSANDCIRCUNFLEJO;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '+' && segundoCaracter == '=') {
         (c.comp_lexico) = MASIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '-' && segundoCaracter == '=') {
         (c.comp_lexico) = MENOSIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '*' && segundoCaracter == '=') {
         (c.comp_lexico) = PORIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '/' && segundoCaracter == '=') {
         (c.comp_lexico) = BARRAIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '%' && segundoCaracter == '=') {
         (c.comp_lexico) = PORCENTAJEIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '&' && segundoCaracter == '=') {
         (c.comp_lexico) = AMPERSANDIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '|' && segundoCaracter == '=') {
         (c.comp_lexico) = BARRAVERTICALIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '^' && segundoCaracter == '=') {
         (c.comp_lexico) = CIRCUNFLEJOIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '&' && segundoCaracter == '&') {
         (c.comp_lexico) = AMPERSANDDOBLE;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '|' && segundoCaracter == '|') {
         (c.comp_lexico) = BARRAVERTICALDOBLE;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '<' && segundoCaracter == '-') {
         (c.comp_lexico) = MENORMENOS;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '+' && segundoCaracter == '+') {
         (c.comp_lexico) = MASDOBLE;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 1;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 1;
     } else if (primerCaracter == '-' && segundoCaracter == '-') {
         (c.comp_lexico) = MENOSDOBLE;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 1;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 1;
     } else if (primerCaracter == '=' && segundoCaracter == '=') {
         (c.comp_lexico) = IGUALDOBLE;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '!' && segundoCaracter == '=') {
         (c.comp_lexico) = EXCLAMACIONIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '<' && segundoCaracter == '=') {
         (c.comp_lexico) = MENORIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == '>' && segundoCaracter == '=') {
         (c.comp_lexico) = MAYORIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == ':' && segundoCaracter == '=') {
         (c.comp_lexico) = DOSPUNTOSIGUAL;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        insertarSemi = 0;
     } else if (primerCaracter == ')' || primerCaracter == ']' || primerCaracter == '}') {
         // Si tiene 1 solo carácter, asignamos ASCII y devolvemos dos caracteres leídos de más
         (c.comp_lexico) = (int) primerCaracter;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        devolver_un_caracter(); _restar_columna(segundoCaracter);
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        devolver_un_caracter();
+        _restar_col(segundoCaracter);
 
         // En estos casos, si termina línea, hará falta insertar semicolon (;)
-        insertarSemicolon = 1;
+        insertarSemi = 1;
     } else {
         // Si tiene 1 solo carácter, asignamos ASCII y devolvemos dos caracteres leídos de más
         (c.comp_lexico) = (int) primerCaracter;
-        devolver_un_caracter(); _restar_columna(tercerCaracter);
-        devolver_un_caracter(); _restar_columna(segundoCaracter);
-        insertarSemicolon = 0;
+        devolver_un_caracter();
+        _restar_col(tercerCaracter);
+        devolver_un_caracter();
+        _restar_col(segundoCaracter);
+        insertarSemi = 0;
     }
 
     // Copiamos el lexema y finalizamos el procesamiento
     if (copiar_lexema(&c) == 1) {
-        error_tambloque(linea, columna, c.lexema);
+        error_tambloque(lin, col, c.lexema);
     }
 }
 
@@ -457,7 +510,8 @@ int _procesarString(char separador) {
         case '`':
             while (estado != FIN_COMPONENTE) {
                 // Consumimos un carácter
-                sig = sig_caracter(); _sumar_columna(sig);
+                sig = sig_caracter();
+                _sumar_col(sig);
                 // Terminan con `
                 if (sig == '`') {
                     estado = FIN_COMPONENTE;
@@ -465,13 +519,13 @@ int _procesarString(char separador) {
                 // Si se llega al final del archivo antes, hay un error
                 if (sig == EOF) {
                     devolver_un_caracter();
-                    _restar_columna(sig);
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = ERRORLEXICO;
                     if (copiar_lexema(&c) == 1) {
-                        error_tambloque(linea, columna, c.lexema);
+                        error_tambloque(lin, col, c.lexema);
                     }
-                    error_string(linea, columna, c.lexema);
+                    error_string(lin, col, c.lexema);
                     return 1;
                 }
                 if (sig == '\r') {
@@ -481,18 +535,19 @@ int _procesarString(char separador) {
             }
             // Aceptamos el lexema
             if (copiar_lexema(&c) == 1) {
-                error_tambloque(linea, columna, c.lexema);
+                error_tambloque(lin, col, c.lexema);
             }
             c.comp_lexico = STRING;
 
             // Si termina línea, hay que insertar semicolon
-            insertarSemicolon = 1;
+            insertarSemi = 1;
             break;
 
         // Interpreted string
         case '"':
             while (estado != FIN_COMPONENTE) {
-                sig = sig_caracter(); _sumar_columna(sig);
+                sig = sig_caracter();
+                _sumar_col(sig);
                 switch (estado) {
                     case 0:
                         // Para comprobar el escape de caracteres
@@ -506,13 +561,13 @@ int _procesarString(char separador) {
                         // Si se llega al final del archivo antes, hay un error
                         if (sig == EOF) {
                             devolver_un_caracter();
-                            _restar_columna(sig);
+                            _restar_col(sig);
                             estado = FIN_COMPONENTE;
                             c.comp_lexico = ERRORLEXICO;
                             if (copiar_lexema(&c) == 1) {
-                                error_tambloque(linea, columna, c.lexema);
+                                error_tambloque(lin, col, c.lexema);
                             }
-                            error_string(linea, columna, c.lexema);
+                            error_string(lin, col, c.lexema);
                             return 1;
                         }
                         break;
@@ -521,24 +576,24 @@ int _procesarString(char separador) {
                         if (sig != 'a' && sig != 'b' && sig !='f' && sig != 'n' && sig != 'r' &&
                             sig != 't' && sig != 'v' && sig != '\\' && sig != '"' && sig != '\'') {
                             devolver_un_caracter();
-                            _restar_columna(sig);
+                            _restar_col(sig);
                             estado = FIN_COMPONENTE;
                             c.comp_lexico = ERRORLEXICO;
                             if (copiar_lexema(&c) == 1) {
-                                error_tambloque(linea, columna, c.lexema);
+                                error_tambloque(lin, col, c.lexema);
                             }
-                            error_string(linea, columna, c.lexema);
+                            error_string(lin, col, c.lexema);
                             return 1;
                             // Si se llega al final del archivo antes, hay un error
                         } else if (sig == EOF) {
                             devolver_un_caracter();
-                            _restar_columna(sig);
+                            _restar_col(sig);
                             estado = FIN_COMPONENTE;
                             c.comp_lexico = ERRORLEXICO;
                             if (copiar_lexema(&c) == 1) {
-                                error_tambloque(linea, columna, c.lexema);
+                                error_tambloque(lin, col, c.lexema);
                             }
-                            error_string(linea, columna, c.lexema);
+                            error_string(lin, col, c.lexema);
                             return 1;
                         } else {
                             estado = 0;
@@ -550,12 +605,12 @@ int _procesarString(char separador) {
             }
             // Aceptamos el lexema
             if (copiar_lexema(&c) == 1) {
-                error_tambloque(linea, columna, c.lexema);
+                error_tambloque(lin, col, c.lexema);
             }
             c.comp_lexico = STRING;
 
             // Si termina línea, hay que insertar semicolon
-            insertarSemicolon = 1;
+            insertarSemi = 1;
             break;
         default:
             // Si no es ninguno de estos inicios, hay un error
@@ -573,18 +628,19 @@ int _procesarSinCarryReturn() {
     contenedor aux = {-1, NULL};
     devolver_un_caracter();
     if (copiar_lexema(&aux) == 1) {
-        error_tambloque(linea, columna, aux.lexema);
+        error_tambloque(lin, col, aux.lexema);
     }
 
     // Consumimos un carácter
     sig = sig_caracter();
-    _sumar_columna(sig);
+    _sumar_col(sig);
 
     // Si leemos carry-return
     if (sig == '\r') {
         ignorar_caracter();
         while (estado != FIN_COMPONENTE) {
-            sig = sig_caracter(); _sumar_columna(sig);
+            sig = sig_caracter();
+            _sumar_col(sig);
             // Terminan con `
             if (sig == '`') {
                 estado = FIN_COMPONENTE;
@@ -592,11 +648,11 @@ int _procesarSinCarryReturn() {
             // Si se llega al final del archivo antes, hay un error
             if (sig == EOF) {
                 devolver_un_caracter();
-                _restar_columna(sig);
+                _restar_col(sig);
                 estado = FIN_COMPONENTE;
                 c.comp_lexico = ERRORLEXICO;
                 if (copiar_lexema(&c) == 1) {
-                    error_tambloque(linea, columna, c.lexema);
+                    error_tambloque(lin, col, c.lexema);
                 }
             }
             if (sig == '\r') {
@@ -606,10 +662,10 @@ int _procesarSinCarryReturn() {
         }
         // Aceptamos el lexema
         if (copiar_lexema(&c) == 1) {
-            error_tambloque(linea, columna, c.lexema);
+            error_tambloque(lin, col, c.lexema);
         }
         if (c.comp_lexico == ERRORLEXICO) {
-            error_string(linea, columna, c.lexema);
+            error_string(lin, col, c.lexema);
             return 1;
         } else {
             c.comp_lexico = STRING;
@@ -619,7 +675,7 @@ int _procesarSinCarryReturn() {
         asignar_lexema(&c, _sumar_strings(aux.lexema, c.lexema));
 
         // Si termina línea, hay que insertar semicolon
-        insertarSemicolon = 1;
+        insertarSemi = 1;
     }
 
     return 0;
@@ -695,7 +751,8 @@ int _procesarNumero(char primerCaracter) {
                     c.comp_lexico = IMAGINARY;
                 }
                 else { // es un entero 0
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = INT;
                 }
@@ -705,7 +762,8 @@ int _procesarNumero(char primerCaracter) {
                 else if (sig == '0' || sig == '1') estado = 2; // Binario con dígito
                 else {
                     // Número binario
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = BINARY_INT;
                 }
@@ -715,7 +773,8 @@ int _procesarNumero(char primerCaracter) {
                 else if (sig >= '0' && sig <= '7') estado = 3; // Octal con dígitos
                 else {
                     // Número octal
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = OCTAL_INT;
                 }
@@ -731,13 +790,15 @@ int _procesarNumero(char primerCaracter) {
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = IMAGINARY;
                 } else if (sig == 'p' || sig == 'P') {  // Error de exponente hexadecimal
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     tipo = 1;
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = ERRORLEXICO;
                 } else {
                     // Número decimal
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = INT;
                 }
@@ -746,7 +807,8 @@ int _procesarNumero(char primerCaracter) {
                 if (isdigit(sig)) estado = 10; // tiene que separar dígitos
                 else {
                     // Si no, hay error
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 1;
                     c.comp_lexico = ERRORLEXICO;
@@ -756,7 +818,8 @@ int _procesarNumero(char primerCaracter) {
                 if (sig == 0 || sig == 1) estado = 2; // tiene que separar dígitos
                 else {
                     // Si no, hay error
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 1;
                     c.comp_lexico = ERRORLEXICO;
@@ -766,7 +829,8 @@ int _procesarNumero(char primerCaracter) {
                 if (sig >= '0' && sig <= '7') estado = 3; // tiene que separar dígitos
                 else {
                     // Si no, hay error
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 1;
                     c.comp_lexico = ERRORLEXICO;
@@ -778,12 +842,13 @@ int _procesarNumero(char primerCaracter) {
                 else if (sig == '.') {
                     // pueden ser 3 puntos
                     devolver_un_caracter();
-                    _restar_columna(sig);
+                    _restar_col(sig);
                     _procesarOperador('.');
                     tipo = 3;
                 } else {
                     // Resto de casos
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     _procesarOperador('.');
                     tipo = 3;
@@ -794,7 +859,8 @@ int _procesarNumero(char primerCaracter) {
                 // Puede haber exponente
                 else if (sig == 'e' || sig == 'E') estado = 30;
                 else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 2;
                     c.comp_lexico = ERRORLEXICO;
@@ -810,7 +876,8 @@ int _procesarNumero(char primerCaracter) {
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = IMAGINARY;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = FLOAT;
                 }
@@ -819,7 +886,8 @@ int _procesarNumero(char primerCaracter) {
                 if (isdigit(sig)) estado = 21;
                 // Tiene que separar dígitos necesariamente
                 else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 2;
                     c.comp_lexico = ERRORLEXICO;
@@ -829,7 +897,8 @@ int _procesarNumero(char primerCaracter) {
                 if (sig == '+' || sig == '-') estado = 31;
                 else if (isdigit(sig)) estado = 32; // Permitir 1.e0
                 else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 2;
                     c.comp_lexico = ERRORLEXICO;
@@ -838,7 +907,8 @@ int _procesarNumero(char primerCaracter) {
             case 31: // Signo después de exponente
                 if (isdigit(sig)) estado = 32;  // Tiene que haber un dígito
                 else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 2;
                     c.comp_lexico = ERRORLEXICO;
@@ -851,7 +921,8 @@ int _procesarNumero(char primerCaracter) {
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = IMAGINARY;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = FLOAT;
                 }
@@ -860,7 +931,8 @@ int _procesarNumero(char primerCaracter) {
                 if (isdigit(sig)) estado = 32;
                 // Debe separar dígitos necesariamente
                 else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     tipo = 2;
                     c.comp_lexico = ERRORLEXICO;
@@ -868,18 +940,19 @@ int _procesarNumero(char primerCaracter) {
                 break;
         }
         if (estado != FIN_COMPONENTE) {
-            sig = sig_caracter(); _sumar_columna(sig);
+            sig = sig_caracter();
+            _sumar_col(sig);
         }
     }
 
     // Si no se ha terminado procesando un operador (se procesa un número)
     if (tipo != 3) {
         if (copiar_lexema(&c) == 1) {
-            error_tambloque(linea, columna, c.lexema);
+            error_tambloque(lin, col, c.lexema);
         }
 
         // Si termina línea, hay que insertar semicolon
-        insertarSemicolon = 1;
+        insertarSemi = 1;
     }
 
     // Manejo de tipo de error
@@ -887,11 +960,11 @@ int _procesarNumero(char primerCaracter) {
         switch (tipo) {
             case 1:
                 // enteros
-                error_entero(linea, columna, c.lexema);
+                error_entero(lin, col, c.lexema);
                 break;
             case 2:
                 // floats
-                error_float(linea, columna, c.lexema);
+                error_float(lin, col, c.lexema);
                 break;
             default:
                 break;
@@ -910,7 +983,8 @@ int _procesarHexadecimal() {
 
     while (estado != FIN_COMPONENTE) {
         // Consume un carácter
-        sig = sig_caracter(); _sumar_columna(sig);
+        sig = sig_caracter();
+        _sumar_col(sig);
         switch (estado) {
             case 0:
                 // Comienzo de la lectura
@@ -921,7 +995,8 @@ int _procesarHexadecimal() {
                 } else if (sig == '.') {
                     estado = 3;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     // Si no hay digito HEX o _
                     c.comp_lexico = ERRORLEXICO;
@@ -938,7 +1013,8 @@ int _procesarHexadecimal() {
                         estado = 5;
                     } else {
                         // Si ya ha acabado el literal HEX
-                        devolver_un_caracter(); _restar_columna(sig);
+                        devolver_un_caracter();
+                        _restar_col(sig);
                         estado = FIN_COMPONENTE;
                         (c.comp_lexico) = HEX_INT;
                     }
@@ -948,7 +1024,8 @@ int _procesarHexadecimal() {
                 // Se ha leído una _
                 if (!isxdigit(sig)) {
                     // No se puede acabar en _
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = ERRORLEXICO;
                 } else {
@@ -959,11 +1036,13 @@ int _procesarHexadecimal() {
                 if (isxdigit(sig)) {
                     estado = 4;
                 } else if (sig == 'p' || sig == 'P') {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = ERRORLEXICO;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     (c.comp_lexico) = HEX_FLOAT;
                 }
@@ -977,14 +1056,16 @@ int _procesarHexadecimal() {
                 } else if (sig == 'e' || sig == 'E') {
                     estado = 9;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     (c.comp_lexico) = HEX_FLOAT;
                 }
                 break;
             case 9: // e o E del exponente
                 if (sig == '+' || sig == '-') {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = ERRORLEXICO;
                 } else if (isxdigit(sig)) {
@@ -992,7 +1073,8 @@ int _procesarHexadecimal() {
                 } else if (sig == 'p' || sig == 'P') {
                     estado = 5;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     (c.comp_lexico) = HEX_FLOAT;
                 }
@@ -1004,7 +1086,8 @@ int _procesarHexadecimal() {
                 } else if (isdigit(sig)) {
                     estado = 7;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = ERRORLEXICO;
                 }
@@ -1014,7 +1097,8 @@ int _procesarHexadecimal() {
                 if (isdigit(sig)) {
                     estado = 7;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     c.comp_lexico = ERRORLEXICO;
                 }
@@ -1026,7 +1110,8 @@ int _procesarHexadecimal() {
                 } else if (sig == '_') {
                     estado = 8;
                 } else {
-                    devolver_un_caracter(); _restar_columna(sig);
+                    devolver_un_caracter();
+                    _restar_col(sig);
                     estado = FIN_COMPONENTE;
                     (c.comp_lexico) = HEX_FLOAT;
                 }
@@ -1043,15 +1128,15 @@ int _procesarHexadecimal() {
     }
 
     if (copiar_lexema(&c) == 1) {
-        error_tambloque(linea, columna, c.lexema);
+        error_tambloque(lin, col, c.lexema);
     }
 
     // Si termina línea, hay que insertar semicolon
-    insertarSemicolon = 1;
+    insertarSemi = 1;
 
     // Manejo de error
     if (c.comp_lexico == ERRORLEXICO) {
-        error_hexadecimal(linea, columna, c.lexema);
+        error_hexadecimal(lin, col, c.lexema);
         return 1;
     }
 
@@ -1059,7 +1144,7 @@ int _procesarHexadecimal() {
     return 0;
 }
 
-void _devolverSemicolon() {
+/*void _devolverSemicolon() {
     // Guarda el componente léxico
     c.comp_lexico = (int) ';';
 
@@ -1073,7 +1158,7 @@ void _devolverSemicolon() {
     }
     // Ponemos a 0
     insertarSemicolon = 0;
-}
+}*/
 
 void _buscar_insertar_lexema(int comp_lexico) {
     //Si no ha habido un error, se continua
@@ -1089,31 +1174,31 @@ void _buscar_insertar_lexema(int comp_lexico) {
 }
 
 
-void _sumar_columna(char caracter) {
+void _sumar_col(char caracter) {
     if (caracter == '\n') {
         // si se cambia de línea
-        _sumar_linea();
+        _sumar_lin();
     } else {
-        columna++;
+        col++;
     }
 }
 
-void _restar_columna(char caracter) {
+void _restar_col(char caracter) {
     if (caracter == '\n') {
         // si se cambia de línea
-        _restar_linea();
+        _restar_lin();
     } else {
-        columna--;
+        col--;
     }
 }
 
-void _sumar_linea() {
-    linea++;
-    columna_antigua = columna;
-    columna = 1;
+void _sumar_lin() {
+    lin++;
+    col_ant = col;
+    col = 1;
 }
 
-void _restar_linea() {
-    linea--;
-    columna = columna_antigua;
+void _restar_lin() {
+    lin--;
+    col = col_ant;
 }
