@@ -39,8 +39,8 @@
 - en el manual nuevo puede aparecer cómo hacer todos los includes necesarios.
 - el consejo fundamental es LEER el manual (hasta la página 16, o 17, con las condiciones de arranque).
 - respecto a los errores, es más fácil que se nos ocurran expresiones regulares que comportan error. En esta práctica
-  es mucho más sencillo y tendrá sentido hacerlo. La práctica debe ser capaz de que, si emite un error, sepa en qué línea
-  se produce. Pero algunos componentes léxicos pueden ocupar más de una línea => el autómata de yylex() no debe comerse
+  es mucho más sencillo y tendrá sentido hacero. La práctica debe ser capaz de que, si emite un error, sepa en qué línea
+  se produce. Pero algunos componentes léxicos puelden ocupar más de una línea => el autómata de yylex() no debe comerse
   el salto de línea. flex proporciona formas para resolver este problema: una de ellas muy sencilla. ESTO ES MUY 
   IMPORTANTE.
 - la P1 es una disculpa para leer el manual de flex.

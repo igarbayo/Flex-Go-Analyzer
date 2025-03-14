@@ -14,27 +14,27 @@
  * @param columna del error
  * @param lexema erróneo
  */
-void _imprimir_error_lexico(const char* mensaje, int linea, int columna, char* lexema) {
+void _imprimir_error_lexico(const char* mensaje, int linea, int columna, char* lexema, char* sugerencia) {
     printf(RED "\tError léxico: %s\n" RESET, mensaje);
     printf(RED "\tLínea %d, columna %d: " RESET, linea, columna);
     printf(YELLOW "%s\n" RESET, lexema);
-    printf(RED "\tSugerencia: Revise el carácter o símbolo en la posición indicada.\n" RESET);
+    printf(RED "\tSugerencia: %s.\n" RESET, sugerencia);
 }
 
-void error_string(int linea, int columna, char* lexema) {
-    _imprimir_error_lexico("String", linea, columna, lexema);
+void error_string(int linea, int columna, char* lexema, char* sugerencia) {
+    _imprimir_error_lexico("String", linea, columna, lexema, sugerencia);
 }
 
-void error_hexadecimal(int linea, int columna, char* lexema) {
-    _imprimir_error_lexico("Hexadecimal", linea, columna, lexema);
+void error_hexadecimal(int linea, int columna, char* lexema, char* sugerencia) {
+    _imprimir_error_lexico("Hexadecimal", linea, columna, lexema, sugerencia);
 }
 
-void error_entero(int linea, int columna, char* lexema) {
-    _imprimir_error_lexico("Integer", linea, columna, lexema);
+void error_entero(int linea, int columna, char* lexema, char* sugerencia) {
+    _imprimir_error_lexico("Integer", linea, columna, lexema, sugerencia);
 }
 
-void error_float(int linea, int columna, char* lexema) {
-    _imprimir_error_lexico("Float", linea, columna, lexema);
+void error_float(int linea, int columna, char* lexema, char* sugerencia) {
+    _imprimir_error_lexico("Float", linea, columna, lexema, sugerencia);
 }
 
 // ERRORES DE EJECUCIÓN ///////////////////////////////////////////

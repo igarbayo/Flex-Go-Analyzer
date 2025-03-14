@@ -9,7 +9,7 @@
  * @param columna del error
  * @param lexema erróneo
  */
-void error_entero(int linea, int columna, char* lexema);
+void error_entero(int linea, int columna, char* lexema, char* sugerencia);
 
 /**
  * Error de construcción de floating-point literal
@@ -17,7 +17,7 @@ void error_entero(int linea, int columna, char* lexema);
  * @param columna del error
  * @param lexema erróneo
  */
-void error_float(int linea, int columna, char* lexema);
+void error_float(int linea, int columna, char* lexema, char* sugerencia);
 
 /**
  * Error de construcción de string literal
@@ -25,7 +25,7 @@ void error_float(int linea, int columna, char* lexema);
  * @param columna del error
  * @param lexema erróneo
  */
-void error_string(int linea, int columna, char* lexema);
+void error_string(int linea, int columna, char* lexema, char* sugerencia);
 
 /**
  * Error de construcción de hexadecimal integer literal o hexadecimal floating-point literal
@@ -33,7 +33,7 @@ void error_string(int linea, int columna, char* lexema);
  * @param columna del error
  * @param lexema erróneo
  */
-void error_hexadecimal(int linea, int columna, char* lexema);
+void error_hexadecimal(int linea, int columna, char* lexema, char* sugerencia);
 
 
 // ERRORES DE EJECUCIÓN ///////////////////////////////////////

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "definiciones.h"
 #include "tabla_simbolos.h"
+#include "errores.h"
 
 #define RED     "\x1b[31m"
 #define YELLOW  "\x1b[33m"
@@ -89,6 +90,13 @@ int _buscar_insertar_identificador(char* lexema) {
 
 %x COMMENT_BLOCK 
 
+underscore_no_digits		{decimal_digit}+[_]([^0-9 ,])*|{decimal_digit}+[_](\.[0-9]+)|{decimal_digit}+\.[_][0-9]+|({decimal_digits}\.?{decimal_digits}?[_]{decimal_exponent}?)|\.({decimal_digits}+[_]{decimal_exponent}?)|{decimal_float_lit}[_]{decimal_digits}*
+consecutive_underscores		{decimal_digit}+[_][_]+{decimal_digit}*
+mantissa_int_no_digits		0[xX]{hex_exponent}
+mantissa_float_no_digits	0[xX]\.{hex_exponent}
+p_exponent			{hex_mantissa}{hex_exponent}
+e_exponent			0[xX]{hex_mantissa}{decimal_exponent}
+
 letter        		[a-zA-Z_]
 decimal_digit 		[0-9]
 binary_digit  		[01]
@@ -97,7 +105,7 @@ hex_digit     		[0-9a-fA-F]
 
 identifier    		{letter}({letter}|{decimal_digit})*
 
-decimal_lit   		0|([1-9][_]?{decimal_digit}*)
+decimal_lit   		0|([1-9][_]?{decimal_digit}+)
 binary_lit    		0[bB]{binary_digit}+
 octal_lit     		0[oO]?{octal_digit}+
 hex_lit       		0[xX]{hex_digit}+
@@ -154,6 +162,28 @@ string_lit 		{raw_string_lit}|{interpreted_string_lit}
     		}
 }
 
+
+{underscore_no_digits}		{
+					error_entero(linea, columna, yytext, "\"_\" debe separar dos dígitos");
+				}
+{consecutive_underscores}	{
+					error_entero(linea, columna, yytext, "no puede haber dos o más \"_\" seguidas");
+				}
+{mantissa_int_no_digits}	{
+					error_entero(linea, columna, yytext, "la mantisa debe tener dígitos");
+				}
+{mantissa_float_no_digits}	{
+					error_float(linea, columna, yytext, "la mantisa debe tener dígitos");
+				}
+{p_exponent}			{
+					error_entero(linea, columna, yytext, "el exponente p necesita una mantisa hexadecimal");
+				}
+{e_exponent}			{
+					error_entero(linea, columna, yytext, "la mantisa hexadecimal necesita un exponente p");
+				}
+
+
+
 {identifier}    {
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -194,6 +224,7 @@ string_lit 		{raw_string_lit}|{interpreted_string_lit}
 			insertarSemicolon = 1;
 			return STRING;
 		}
+		
 		
 "<<="   {
 		// Para cada caracter de la expresión
