@@ -105,7 +105,7 @@ hex_digit     		[0-9a-fA-F]
 
 identifier    		{letter}({letter}|{decimal_digit})*
 
-decimal_lit   		0|([1-9][_]?{decimal_digit}+)
+decimal_lit   		0|([1-9][_]?{decimal_digit}*)
 binary_lit    		0[bB]{binary_digit}+
 octal_lit     		0[oO]?{octal_digit}+
 hex_lit       		0[xX]{hex_digit}+
@@ -192,6 +192,14 @@ string_lit 		{raw_string_lit}|{interpreted_string_lit}
 			insertarSemicolon = 1;
 			return _buscar_insertar_identificador(yytext);
 		}
+{imaginary_lit} {
+			// Para cada caracter de la expresión
+			for (i = 0; yytext[i] != '\0'; i++) {
+        			_sumar_columna(yytext[i]);
+    			}
+			insertarSemicolon = 1; 
+			return IMAGINARY; 
+		}
 {int_lit}       { 
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -207,14 +215,6 @@ string_lit 		{raw_string_lit}|{interpreted_string_lit}
     			}
 			insertarSemicolon = 1; 
 			return FLOAT; 
-		}
-{imaginary_lit} {
-			// Para cada caracter de la expresión
-			for (i = 0; yytext[i] != '\0'; i++) {
-        			_sumar_columna(yytext[i]);
-    			}
-			insertarSemicolon = 1; 
-			return IMAGINARY; 
 		}
 {string_lit}   	{ 
 			// Para cada caracter de la expresión

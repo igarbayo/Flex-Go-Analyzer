@@ -8,7 +8,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -g
 
 # Archivos fuente y headers
-SRCS = main.c avl.c analisis_lexico.c analisis_sintactico.c tabla_simbolos.c sistema_entrada.c errores.c
+SRCS = main.c avl.c analisis_lexico.c analisis_sintactico.c tabla_simbolos.c sistema_entrada.c errores.c go.yy.c
 HEADERS = definiciones.h avl.h analisis_lexico.h analisis_sintactico.h tabla_simbolos.h sistema_entrada.h errores.h
 
 # Objetos generados
