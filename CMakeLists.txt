@@ -15,5 +15,5 @@ add_executable(P1_CompGo main.c
         tabla_simbolos.h
         errores.c
         errores.h
-        lex.yy.c
+        go.yy.c
 )

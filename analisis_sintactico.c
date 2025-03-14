@@ -8,7 +8,7 @@ extern FILE *yyin;  // Declaración de la variable global de Flex
 
 void iniciar_analisis(char *nombre_fichero) {
     contenedor c;
-    int i=0, j=0;
+    int i=0;
 
     // Inicio
     iniciar_analisis_lexico(nombre_fichero);

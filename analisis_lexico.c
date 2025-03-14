@@ -13,6 +13,7 @@ extern int columna;
 extern int yylex();  // Declarar la función generada por Flex
 extern char* yytext; // Contiene el texto del token actual
 extern FILE *yyin;  // Declaración de la variable global de Flex
+extern void liberar_recursos();
 
 
 // FUNCIONES PÚBLICAS /////////////////////////////////////////
@@ -27,6 +28,7 @@ void iniciar_analisis_lexico(char* fichero) {
 
 void terminar_analisis_lexico() {
     fclose(yyin);
+    liberar_recursos();
 }
 
 contenedor sig_comp_lexico() {

@@ -28,6 +28,7 @@ void _devolverSemicolon() {
     semicolon[0] = ';';
     semicolon[1] = '\0';
     yytext = semicolon;
+    yyleng = 1;
     
     // Ponemos a 0
     insertarSemicolon = 0;
@@ -582,5 +583,11 @@ string_lit 		{raw_string_lit}|{interpreted_string_lit}
 
 int yywrap() {
     return 1;
+}
+
+/* Código adicional después de la sección de reglas */
+void liberar_recursos() {
+    yy_delete_buffer(YY_CURRENT_BUFFER);
+    yylex_destroy();
 }
 
