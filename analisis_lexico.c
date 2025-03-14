@@ -160,7 +160,6 @@ contenedor sig_comp_lexico() {
 
     if ((c.comp_lexico = yylex()) != 0) {
         c.lexema = yytext;
-        printf("Línea: %d\tColumna: %d\t", linea, columna);
     }
 
     return c;

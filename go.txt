@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "definiciones.h"
+#include "tabla_simbolos.h"
 
 #define RED     "\x1b[31m"
 #define YELLOW  "\x1b[33m"
@@ -66,44 +67,62 @@ void _restar_columna(char caracter) {
 }
 
 
+// Al reconocer un identificador
+int _buscar_insertar_identificador(char* lexema) {
+    //Si no ha habido un error, se continua
+    int busqueda = buscar_elemento(lexema);
+    //Si no está, lo introducimos en la tabla.
+    if (busqueda == -1) {
+    	contenedor token = {-1, NULL};
+    	token.comp_lexico = ID;
+    	token.lexema = lexema;
+        insertar_elemento(token);
+        return ID;
+    } else {
+        //Si ya estaba, le asignamos el componente que hay en la tabla.
+        return busqueda;
+    }
+}
+
+
 %}
 
 %x COMMENT_BLOCK 
 
-letter        [a-zA-Z_]
-decimal_digit [0-9]
-binary_digit  [01]
-octal_digit   [0-7]
-hex_digit     [0-9a-fA-F]
+letter        		[a-zA-Z_]
+decimal_digit 		[0-9]
+binary_digit  		[01]
+octal_digit   		[0-7]
+hex_digit     		[0-9a-fA-F]
 
-identifier    {letter}({letter}|{decimal_digit})*
+identifier    		{letter}({letter}|{decimal_digit})*
 
-decimal_lit   0|([1-9][_]?{decimal_digit}*)
-binary_lit    0[bB]{binary_digit}+
-octal_lit     0[oO]?{octal_digit}+
-hex_lit       0[xX]{hex_digit}+
+decimal_lit   		0|([1-9][_]?{decimal_digit}*)
+binary_lit    		0[bB]{binary_digit}+
+octal_lit     		0[oO]?{octal_digit}+
+hex_lit       		0[xX]{hex_digit}+
 
-int_lit       {decimal_lit}|{binary_lit}|{octal_lit}|{hex_lit}
+int_lit       		{decimal_lit}|{binary_lit}|{octal_lit}|{hex_lit}
 
-decimal_digits {decimal_digit}([_]?[decimal_digit])*
-binary_digits  {binary_digit}([_]?[binary_digit])*
-octal_digits   {octal_digit}([_]?[octal_digit])*
-hex_digits     {hex_digit}([_]?[hex_digit])*
+decimal_digits 		{decimal_digit}([_]?[decimal_digit])*
+binary_digits  		{binary_digit}([_]?[binary_digit])*
+octal_digits   		{octal_digit}([_]?[octal_digit])*
+hex_digits     		{hex_digit}([_]?[hex_digit])*
 
-decimal_exponent [eE][+-]?{decimal_digits}+
-decimal_float_lit ({decimal_digits}\.?{decimal_digits}?{decimal_exponent}?)|\.({decimal_digits}+{decimal_exponent}?)
+decimal_exponent 	[eE][+-]?{decimal_digits}+
+decimal_float_lit 	({decimal_digits}\.?{decimal_digits}?{decimal_exponent}?)|\.({decimal_digits}+{decimal_exponent}?)
 
-hex_mantissa [_]?{hex_digits}\.?{hex_digits}?
-hex_exponent [pP][+-]?{decimal_digits}
-hex_float_lit 0[xX]{hex_mantissa}{hex_exponent}
+hex_mantissa 		[_]?{hex_digits}\.?{hex_digits}?
+hex_exponent 		[pP][+-]?{decimal_digits}
+hex_float_lit 		0[xX]{hex_mantissa}{hex_exponent}
 
-float_lit {decimal_float_lit}|{hex_float_lit}
+float_lit 		{decimal_float_lit}|{hex_float_lit}
 
-imaginary_lit ({decimal_digits}|{int_lit}|{float_lit})i
+imaginary_lit 		({decimal_digits}|{int_lit}|{float_lit})i
 
-raw_string_lit `([^`]|[\n])*`
-interpreted_string_lit \"([^\"\\]|\\.)*\"
-string_lit {raw_string_lit}|{interpreted_string_lit}
+raw_string_lit 		`([^`]|[\n])*`
+interpreted_string_lit 	\"([^\"\\]|\\.)*\"
+string_lit 		{raw_string_lit}|{interpreted_string_lit}
 
 %%
 
@@ -141,7 +160,7 @@ string_lit {raw_string_lit}|{interpreted_string_lit}
         			_sumar_columna(yytext[i]);
     			}
 			insertarSemicolon = 1;
-			return ID;
+			return _buscar_insertar_identificador(yytext);
 		}
 {int_lit}       { 
 			// Para cada caracter de la expresión
