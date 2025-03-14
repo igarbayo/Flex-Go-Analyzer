@@ -1965,7 +1965,7 @@ case 5:
 YY_RULE_SETUP
 #line 167 "go.l"
 {
-					error_entero(linea, columna, yytext, "\"_\" debe separar dos dígitos");
+					error_float(linea, columna, yytext, "\"_\" debe separar dos dígitos");
 				}
 	YY_BREAK
 case 6:

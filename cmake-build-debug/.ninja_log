@@ -9,3 +9,7 @@
 1	69	1741952086114811168	CMakeFiles/P1_CompGo.dir/lex.yy.c.o	e52390a87903393e
 0	24	1741951015149645320	CMakeFiles/P1_CompGo.dir/analisis_lexico.c.o	95f1a7a31425ad39
 1	33	1741950905299425061	CMakeFiles/P1_CompGo.dir/tabla_simbolos.c.o	e935329a729cf5c6
+1	17	1741954432348593934	CMakeFiles/P1_CompGo.dir/analisis_lexico.c.o	95f1a7a31425ad39
+1	17	1741954432348593934	CMakeFiles/P1_CompGo.dir/analisis_sintactico.c.o	d69331e9f1fcf764
+1	63	1741954432348593934	CMakeFiles/P1_CompGo.dir/go.yy.c.o	909eef97945f92a3
+63	75	1741954432410595146	P1_CompGo	e4200f542edea620

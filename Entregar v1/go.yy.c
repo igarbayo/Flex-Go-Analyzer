@@ -1,5 +1,6 @@
+#line 2 "go.yy.c"
 
-#line 3 "lex.yy.c"
+#line 4 "go.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -1548,8 +1549,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "go.txt"
-#line 2 "go.txt"
+#line 1 "go.l"
+#line 2 "go.l"
 #include <stdio.h>
 #include <stdlib.h>
 #include "definiciones.h"
@@ -1579,6 +1580,7 @@ void _devolverSemicolon() {
     semicolon[0] = ';';
     semicolon[1] = '\0';
     yytext = semicolon;
+    yyleng = 1;
     
     // Ponemos a 0
     insertarSemicolon = 0;
@@ -1637,9 +1639,9 @@ int _buscar_insertar_identificador(char* lexema) {
 }
 
 
-#line 1641 "lex.yy.c"
+#line 1643 "go.yy.c"
  
-#line 1643 "lex.yy.c"
+#line 1645 "go.yy.c"
 
 #define INITIAL 0
 #define COMMENT_BLOCK 1
@@ -1857,10 +1859,10 @@ YY_DECL
 		}
 
 	{
-#line 135 "go.txt"
+#line 136 "go.l"
 
 
-#line 1864 "lex.yy.c"
+#line 1866 "go.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1919,7 +1921,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 137 "go.txt"
+#line 138 "go.l"
 { 
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -1930,7 +1932,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 145 "go.txt"
+#line 146 "go.l"
 { 
 			BEGIN(COMMENT_BLOCK);
 		}  
@@ -1938,7 +1940,7 @@ YY_RULE_SETUP
 
 case 3:
 YY_RULE_SETUP
-#line 150 "go.txt"
+#line 151 "go.l"
 {
     			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -1951,7 +1953,7 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 159 "go.txt"
+#line 160 "go.l"
 {
     			_sumar_columna(yytext[0]);
     			/* No hacer nada, solo ignorar */
@@ -1961,49 +1963,49 @@ YY_RULE_SETUP
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 166 "go.txt"
+#line 167 "go.l"
 {
-					error_entero(linea, columna, yytext, "\"_\" debe separar dos dígitos");
+					error_float(linea, columna, yytext, "\"_\" debe separar dos dígitos");
 				}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 169 "go.txt"
+#line 170 "go.l"
 {
 					error_entero(linea, columna, yytext, "no puede haber dos o más \"_\" seguidas");
 				}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 172 "go.txt"
+#line 173 "go.l"
 {
 					error_entero(linea, columna, yytext, "la mantisa debe tener dígitos");
 				}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 175 "go.txt"
+#line 176 "go.l"
 {
 					error_float(linea, columna, yytext, "la mantisa debe tener dígitos");
 				}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 178 "go.txt"
+#line 179 "go.l"
 {
 					error_entero(linea, columna, yytext, "el exponente p necesita una mantisa hexadecimal");
 				}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 181 "go.txt"
+#line 182 "go.l"
 {
 					error_entero(linea, columna, yytext, "la mantisa hexadecimal necesita un exponente p");
 				}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 187 "go.txt"
+#line 188 "go.l"
 {
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -2015,7 +2017,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 195 "go.txt"
+#line 196 "go.l"
 {
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -2027,7 +2029,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 203 "go.txt"
+#line 204 "go.l"
 { 
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -2039,7 +2041,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 211 "go.txt"
+#line 212 "go.l"
 {
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -2052,7 +2054,7 @@ YY_RULE_SETUP
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 219 "go.txt"
+#line 220 "go.l"
 { 
 			// Para cada caracter de la expresión
 			for (i = 0; yytext[i] != '\0'; i++) {
@@ -2064,7 +2066,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 229 "go.txt"
+#line 230 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2076,7 +2078,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 237 "go.txt"
+#line 238 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2088,7 +2090,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 245 "go.txt"
+#line 246 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2100,7 +2102,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 253 "go.txt"
+#line 254 "go.l"
 { 
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2112,7 +2114,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 262 "go.txt"
+#line 263 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2124,7 +2126,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 270 "go.txt"
+#line 271 "go.l"
 { 
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2136,7 +2138,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 278 "go.txt"
+#line 279 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2148,7 +2150,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 286 "go.txt"
+#line 287 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2160,7 +2162,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 294 "go.txt"
+#line 295 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2172,7 +2174,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 302 "go.txt"
+#line 303 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2184,7 +2186,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 310 "go.txt"
+#line 311 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2196,7 +2198,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 318 "go.txt"
+#line 319 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2208,7 +2210,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 326 "go.txt"
+#line 327 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2220,7 +2222,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 334 "go.txt"
+#line 335 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2232,7 +2234,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 342 "go.txt"
+#line 343 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2244,7 +2246,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 350 "go.txt"
+#line 351 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2256,7 +2258,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 358 "go.txt"
+#line 359 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2268,7 +2270,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 366 "go.txt"
+#line 367 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2280,7 +2282,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 374 "go.txt"
+#line 375 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2292,7 +2294,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 382 "go.txt"
+#line 383 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2304,7 +2306,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 390 "go.txt"
+#line 391 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2316,7 +2318,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 398 "go.txt"
+#line 399 "go.l"
 { 
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2328,7 +2330,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 406 "go.txt"
+#line 407 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2340,7 +2342,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 414 "go.txt"
+#line 415 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2352,7 +2354,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 422 "go.txt"
+#line 423 "go.l"
 {
 		// Para cada caracter de la expresión
 		for (i = 0; yytext[i] != '\0'; i++) {
@@ -2364,7 +2366,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 431 "go.txt"
+#line 432 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2373,7 +2375,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 436 "go.txt"
+#line 437 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2382,7 +2384,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 441 "go.txt"
+#line 442 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2391,7 +2393,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 446 "go.txt"
+#line 447 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2400,7 +2402,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 451 "go.txt"
+#line 452 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2409,7 +2411,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 456 "go.txt"
+#line 457 "go.l"
 { 
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2418,7 +2420,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 461 "go.txt"
+#line 462 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2427,7 +2429,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 466 "go.txt"
+#line 467 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2436,7 +2438,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 471 "go.txt"
+#line 472 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2445,7 +2447,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 476 "go.txt"
+#line 477 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2454,7 +2456,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 481 "go.txt"
+#line 482 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2463,7 +2465,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 486 "go.txt"
+#line 487 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2472,7 +2474,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 491 "go.txt"
+#line 492 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2481,7 +2483,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 496 "go.txt"
+#line 497 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0;
@@ -2490,7 +2492,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 501 "go.txt"
+#line 502 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2499,7 +2501,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 506 "go.txt"
+#line 507 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2508,7 +2510,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 511 "go.txt"
+#line 512 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2517,7 +2519,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 516 "go.txt"
+#line 517 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2526,7 +2528,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 521 "go.txt"
+#line 522 "go.l"
 { 
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 1;
@@ -2535,7 +2537,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 526 "go.txt"
+#line 527 "go.l"
 { 
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2544,7 +2546,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 531 "go.txt"
+#line 532 "go.l"
 { 
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 1;
@@ -2553,7 +2555,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 536 "go.txt"
+#line 537 "go.l"
 { 
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 0; 
@@ -2562,7 +2564,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 541 "go.txt"
+#line 542 "go.l"
 { 
 		_sumar_columna(yytext[0]);
 		insertarSemicolon = 1;
@@ -2572,7 +2574,7 @@ YY_RULE_SETUP
 case 64:
 /* rule 64 can match eol */
 YY_RULE_SETUP
-#line 547 "go.txt"
+#line 548 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		if (insertarSemicolon == 1) {
@@ -2585,7 +2587,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 557 "go.txt"
+#line 558 "go.l"
 {
 		_sumar_columna(yytext[0]);
         	;  /* Ignorar espacios y tabulados */
@@ -2593,7 +2595,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT_BLOCK):
-#line 562 "go.txt"
+#line 563 "go.l"
 {
 		_sumar_columna(yytext[0]);
 		if (insertarSemicolon == 1) {
@@ -2613,15 +2615,15 @@ case YY_STATE_EOF(COMMENT_BLOCK):
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 579 "go.txt"
+#line 580 "go.l"
 { printf(RED "UNKNOWN: %s\n" RESET, yytext); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 581 "go.txt"
+#line 582 "go.l"
 ECHO;
 	YY_BREAK
-#line 2625 "lex.yy.c"
+#line 2627 "go.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -3624,11 +3626,17 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 581 "go.txt"
+#line 582 "go.l"
 
 
 int yywrap() {
     return 1;
+}
+
+/* Código adicional después de la sección de reglas */
+void liberar_recursos() {
+    yy_delete_buffer(YY_CURRENT_BUFFER);
+    yylex_destroy();
 }
 
 
