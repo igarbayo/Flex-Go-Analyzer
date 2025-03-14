@@ -13,8 +13,6 @@ add_executable(P1_CompGo main.c
         analisis_sintactico.h
         tabla_simbolos.c
         tabla_simbolos.h
-        sistema_entrada.c
-        sistema_entrada.h
         errores.c
         errores.h
         lex.yy.c

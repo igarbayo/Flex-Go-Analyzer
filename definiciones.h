@@ -6,9 +6,6 @@ typedef struct {
     char *lexema;
 } contenedor;
 
-// Tamaño de bloque para doble centinela
-#define TAMBLOQUE 64
-
 // Identificador
 #define ID 300
 
@@ -69,17 +66,10 @@ typedef struct {
 // Number literals
 #define INT 374
 #define FLOAT 375
-#define HEX_INT 376
-#define HEX_FLOAT 381
 #define IMAGINARY 377
-#define BINARY_INT 378
-#define OCTAL_INT 380
 
 // Más literals
 #define STRING 379
-
-// Error léxico
-#define ERRORLEXICO 400
 
 // End-of-file
 #define FINFICHERO EOF
